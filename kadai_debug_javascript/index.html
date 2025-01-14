@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 
@@ -53,109 +52,112 @@
     </div>
 
     <script>
-        let countdownInterval;
-        let alertInterval;
-        let isPaused;
+    let countdownInterval;
+    let alertInterval;
+    let isPaused;
 
-        // 入力フォームの値をタイマーに表示する関数
-        function updateTimer() {
-            let minutes = document.getElementById('minutes').value || 0;
-            let seconds = document.getElementById('seconds').value || 0;
+    // 入力フォームの値をタイマーに表示する関数
+    function updateTimer() {
+        let minutes = document.getElementById('minutes').value || 0;
+        let seconds = document.getElementById('seconds').value || 0;
 
-            // 入力フォームの値をチェック
-            if (minutes < 0 || seconds < 0) {
-                document.getElementById('error').innerText = "マイナスは入力できません";
-                document.getElementById('error').classList.remove('hidden');
-                return;
-            }
-
-            document.getElementById('error').classList.add('hidden');
-            document.getElementById('timer').innerText = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        // 入力フォームの値をチェック
+        if (minutes < 0 || seconds < 0) {
+            document.getElementById('error').innerText = "マイナスは入力できません";
+            document.getElementById('error').classList.remove('hidden');
+            return;
         }
 
-        // カウントダウンを開始する関数
-        function startCountdown() {
-            let minutes = document.getElementById('minutes').value || 0;
-            let seconds = document.getElementById('seconds').value || 0;
-            let timeLeft = (minutes * 60) + parseInt(seconds);
-            setMode("progress");
-            countdownInterval = setInterval(() => {
-                if(!isPaused) {
-                    timeLeft--;
-                    if(timeLeft < 0) {
-                        clearInterval(countdownInterval);
-                        startAlert();
-                    } else {
-                        let m = Math.floor(timeLeft / 60);
-                        let s = timeLeft % 60;
-                        document.getElementById('timer').innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-                    }
+        document.getElementById('error').classList.add('hidden');
+        document.getElementById('timer').innerText = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+
+    // カウントダウンを開始する関数
+    function startCountdown() {
+        let minutes = document.getElementById('minutes').value || 0;
+        let seconds = document.getElementById('seconds').value || 0;
+        let timeLeft = (minutes * 60) + parseInt(seconds);
+        setMode("progress");
+
+        // カウントダウンの処理
+        countdownInterval = setInterval(() => {
+            if (!isPaused) {
+                timeLeft--;
+                if (timeLeft < 0) {
+                    clearInterval(countdownInterval);
+                    startAlert();
+                } else {
+                    let m = Math.floor(timeLeft / 60);
+                    let s = timeLeft % 60;
+                    document.getElementById('timer').innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
                 }
-            }, 1000);
-        }
+            }
+        }, 1000);
+    }
 
-        // カウントダウンを一時停止する関数
-        function pauseCountdown() {
-            isPaused = true;
-            setMode("paused");
-        }
+    // カウントダウンを一時停止する関数
+    function pauseCountdown() {
+        isPaused = true;
+        setMode("paused");
+    }
 
-        // カウントダウンを再開する関数
-        function resumeCountdown() {
-            isPaused = false;
-            setMode("progress");
-        }
+    // カウントダウンを再開する関数
+    function resumeCountdown() {
+        isPaused = false;
+        setMode("progress");
+    }
 
-        // カウントダウンをリセットする関数
-        function resetCountdown() {
-            clearInterval(countdownInterval);
-            updateTimer();
-            setMode("restart");
-        }
+    // カウントダウンをリセットする関数
+    function resetCountdown() {
+        clearInterval(countdownInterval);  // タイマーをクリア
+        updateTimer();  // タイマー表示をリセット
+        setMode("restart");  // スタートボタンを表示
+        isPaused = false;  // 一時停止状態を解除
+    }
 
-        // 時間設定モードに変更する関数
-        function setTimeMode() {
-            clearInterval(countdownInterval);
-            setMode("setting");
-        }
-
-        // アラートを開始する関数
-        function startAlert() {
-            alertInterval = setInterval(() => {
-                document.body.style.backgroundColor = document.body.style.backgroundColor === 'red' ? 'white' : 'red';
-            }, 1000);
-            document.getElementById('alertStop').classList.remove('hidden')
-        }
-
-        // アラートを停止する関数
-        function stopAlert() {
-            clearInterval(alertInterval);
-            document.body.style.backgroundColor = 'white';
-            document.getElementById('alertStop').classList.add('hidden')
-        }
-
-        // HTML要素の表示を制御する関数
-        function setMode(mode) {
-            const modes = {
-                setting: ["start", "inputForm"],
-                progress: ["pause", "reset", "setTime"],
-                paused: ["resume", "reset", "setTime"],
-                restart: ["start", "setTime"],
-            };
-
-            // すべてのボタンと入力フォームを非表示にする
-            const elements = document.querySelectorAll('#inputForm, #start, #pause, #resume, #reset, #setTime');
-            elements.forEach(elem => elem.classList.add('hidden'));
-
-            // 指定されたモードの要素だけを表示する
-            const ids = modes[mode];
-            ids.forEach(id => document.getElementById(id).classList.remove('hidden'));
-        }
-
-        // 初期状態をセット
-        document.getElementById('error').classList.add('hidden'); // エラーメッセージを非表示
-        document.getElementById('timer').innerText = "00:00"; // タイマー初期値をセット
+    // 時間設定モードに変更する関数
+    function setTimeMode() {
+        clearInterval(countdownInterval);
         setMode("setting");
+    }
+
+    // アラートを開始する関数
+    function startAlert() {
+        alertInterval = setInterval(() => {
+            document.body.style.backgroundColor = document.body.style.backgroundColor === 'red' ? 'white' : 'red';
+        }, 1000);
+        document.getElementById('alertStop').classList.remove('hidden');
+    }
+
+    // アラートを停止する関数
+    function stopAlert() {
+        clearInterval(alertInterval);
+        document.body.style.backgroundColor = 'white';
+        document.getElementById('alertStop').classList.add('hidden');
+    }
+
+    // HTML要素の表示を制御する関数
+    function setMode(mode) {
+        const modes = {
+            setting: ["start", "inputForm"],
+            progress: ["pause", "reset", "setTime"],
+            paused: ["resume", "reset", "setTime"],
+            restart: ["start", "setTime"],  // リセット後の表示状態
+        };
+
+        // すべてのボタンと入力フォームを非表示にする
+        const elements = document.querySelectorAll('#inputForm, #start, #pause, #resume, #reset, #setTime');
+        elements.forEach(elem => elem.classList.add('hidden'));
+
+        // 指定されたモードの要素だけを表示する
+        const ids = modes[mode];
+        ids.forEach(id => document.getElementById(id).classList.remove('hidden'));
+    }
+
+    // 初期状態をセット
+    setMode("setting");
+</script>
+
 
     </script>
 </body>
